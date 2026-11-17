@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione e Invio Dati Missione</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --success: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            grid-column: 1 / -1;
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .preview-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            min-height: 320px;
+            color: #334155;
+            margin-bottom: 16px;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .secondary-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Modulo Rapporto Missione</h1>
+
+    <!-- Colonna Sinistra: Inserimento Dati -->
+    <div class="card">
+        <h2>1. Dati della Missione</h2>
+        <form id="missionForm">
+            <div class="form-group">
+                <label for="emailDestinatario">Email Destinatario *</label>
+                <input type="email" id="emailDestinatario" placeholder="es. ufficio.missioni@azienda.it" required>
+            </div>
+
+            <div class="form-group">
+                <label for="titoloMissione">Titolo / Oggetto Missione *</label>
+                <input type="text" id="titoloMissione" placeholder="es. Sopralluogo tecnico sede Milano" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="operatore">Operatore / Incaricato *</label>
+                    <input type="text" id="operatore" placeholder="Nome e Cognome" required>
+                </div>
+                <div class="form-group">
+                    <label for="stato">Stato Missione</label>
+                    <select id="stato">
+                        <option value="Pianificata">Pianificata</option>
+                        <option value="In corso">In corso</option>
+                        <option value="Completata" selected>Completata</option>
+                        <option value="Annullata">Annullata</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dataMissione">Data *</label>
+                    <input type="date" id="dataMissione" required>
+                </div>
+                <div class="form-group">
+                    <label for="orario">Orario (Inizio - Fine)</label>
+                    <input type="text" id="orario" placeholder="es. 09:00 - 17:30">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="luogo">Luogo / Destinazione *</label>
+                <input type="text" id="luogo" placeholder="es. Via Roma 10, Milano" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descrizione">Descrizione Attività Svolte *</label>
+                <textarea id="descrizione" placeholder="Dettaglia le operazioni eseguite durante la missione..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="noteSpese">Note aggiuntive / Rimborsi spese (€)</label>
+                <textarea id="noteSpese" style="min-height: 60px;" placeholder="es. Pedaggio autostradale € 18,50 - Pranzo € 15,00"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <!-- Colonna Destra: Anteprima e Invio -->
+    <div class="card">
+        <h2>2. Anteprima e Trasferimento</h2>
+        <div class="preview-box" id="previewBox"></div>
+
+        <div class="actions">
+            <button type="button" class="btn-primary" onclick="inviaEmail()">
+                ✉️ Invia Dati via Email
+            </button>
+            <div class="secondary-actions">
+                <button type="button" class="btn-secondary" onclick="copiaTesto()">
+                    📋 Copia Testo
+                </button>
+                <button type="button" class="btn-secondary" onclick="scaricaTxt()">
+                    💾 Scarica .TXT
+                </button>
+            </div>
+            <button type="button" class="btn-secondary" style="margin-top: 8px; color: #dc2626;" onclick="resetModulo()">
+                Svuota Modulo
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">Operazione completata!</div>
+
+<script>
+    // Imposta la data odierna come predefinita
+    document.getElementById('dataMissione').valueAsDate = new Date();
+
+    const inputs = document.querySelectorAll('#missionForm input, #missionForm select, #missionForm textarea');
+    const previewBox = document.getElementById('previewBox');
+
+    // Genera il testo formattato del report
+    function generaTestoReport() {
+        const titolo = document.getElementById('titoloMissione').value.trim() || '[Non specificato]';
+        const operatore = document.getElementById('operatore').value.trim() || '[Non specificato]';
+        const stato = document.getElementById('stato').value;
+        const dataRaw = document.getElementById('dataMissione').value;
+        const dataFormattata = dataRaw ? new Date(dataRaw).toLocaleDateString('it-IT') : '[Non specificata]';
+        const orario = document.getElementById('orario').value.trim() || 'Non specificato';
+        const luogo = document.getElementById('luogo').value.trim() || '[Non specificato]';
+        const descrizione = document.getElementById('descrizione').value.trim() || '[Nessuna descrizione inserita]';
+        const noteSpese = document.getElementById('noteSpese').value.trim() || 'Nessuna';
+
+        return `========================================
+RAPPORTO DI MISSIONE
+========================================
+
+OGGETTO:    ${titolo}
+STATO:      ${stato}
+OPERATORE:  ${operatore}
+DATA:       ${dataFormattata}
+ORARIO:     ${orario}
+LUOGO:      ${luogo}
+
+----------------------------------------
+DESCRIZIONE ATTIVITÀ
+----------------------------------------
+${descrizione}
+
+----------------------------------------
+NOTE E SPESE SOSTENUTE
+----------------------------------------
+${noteSpese}
+
+========================================
+Generato il ${new Date().toLocaleString('it-IT')}`;
+    }
+
+    // Aggiorna l'anteprima in tempo reale
+    function aggiornaAnteprima() {
+        previewBox.textContent = generaTestoReport();
+    }
+
+    inputs.forEach(input => input.addEventListener('input', aggiornaAnteprima));
+    aggiornaAnteprima(); // Inizializzazione
+
+    // Funzione principale: trasferimento via email tramite protocollo mailto
+    function inviaEmail() {
+        const form = document.getElementById('missionForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const destinatario = document.getElementById('emailDestinatario').value.trim();
+        const titolo = document.getElementById('titoloMissione').value.trim();
+        const operatore = document.getElementById('operatore').value.trim();
+        const corpo = generaTestoReport();
+
+        const oggettoEmail = encodeURIComponent(`Rapporto Missione: ${titolo} (${operatore})`);
+        const corpoEmail = encodeURIComponent(corpo);
+
+        window.location.href = `mailto:${destinatario}?subject=${oggettoEmail}&body=${corpoEmail}`;
+        mostraNotifica('Apertura client email in corso...');
+    }
+
+    // Copia negli appunti
+    function copiaTesto() {
+        navigator.clipboard.writeText(generaTestoReport()).then(() => {
+            mostraNotifica('Rapporto copiato negli appunti!');
+        });
+    }
+
+    // Scarica file di testo
+    function scaricaTxt() {
+        const testo = generaTestoReport();
+        const titolo = document.getElementById('titoloMissione').value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'missione';
+        const blob = new Blob([testo], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rapporto_${titolo}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        mostraNotifica('File scaricato!');
+    }
+
+    // Reset
+    function resetModulo() {
+        if (confirm('Vuoi cancellare tutti i dati inseriti?')) {
+            document.getElementById('missionForm').reset();
+            document.getElementById('dataMissione').valueAsDate = new Date();
+            aggiornaAnteprima();
+        }
+    }
+
+    function mostraNotifica(messaggio) {
+        const toast = document.getElementById('toast');
+        toast.textContent = messaggio;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+</script>
+
+</body>
+</html>
